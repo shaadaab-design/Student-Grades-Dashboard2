@@ -1,0 +1,49 @@
+const studentForm = document.getElementById("studentForm");
+const studentTableBody = document.getElementById("studentTableBody");
+
+let students = JSON.parse(localStorage.getItem("students")) || [];
+
+function calculateGrade(marks) {
+  if (marks >= 90) return "A";
+  if (marks >= 80) return "B";
+  if (marks >= 70) return "C";
+  if (marks >= 60) return "D";
+  return "F";
+}
+
+function renderStudents() {
+  studentTableBody.innerHTML = "";
+  students.forEach((student, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${student.name}</td>
+      <td>${student.marks}</td>
+      <td>${calculateGrade(student.marks)}</td>
+      <td><button class="delete-btn" onclick="deleteStudent(${index})">Delete</button></td>
+    `;
+    studentTableBody.appendChild(row);
+  });
+}
+
+function deleteStudent(index) {
+  students.splice(index, 1);
+  localStorage.setItem("students", JSON.stringify(students));
+  renderStudents();
+}
+
+studentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const marks = parseInt(document.getElementById("marks").value);
+
+  if (name && !isNaN(marks) && marks >= 0 && marks <= 100) {
+    students.push({ name, marks });
+    localStorage.setItem("students", JSON.stringify(students));
+    renderStudents();
+    studentForm.reset();
+  } else {
+    alert("Enter a valid name and marks between 0–100.");
+  }
+});
+
+renderStudents();
